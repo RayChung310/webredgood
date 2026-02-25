@@ -1,17 +1,13 @@
 package com.aiinpocket.webredgood.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 
 @Entity
 @Table(name = "user_interest_tag")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(UserInterestTagId.class)

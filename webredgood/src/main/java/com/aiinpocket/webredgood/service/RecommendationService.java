@@ -2,14 +2,9 @@ package com.aiinpocket.webredgood.service;
 
 import com.aiinpocket.webredgood.dto.CityDistributionDto;
 import com.aiinpocket.webredgood.dto.FollowerDistributionResponse;
-import com.aiinpocket.webredgood.entity.DimInfluencer;
-import com.aiinpocket.webredgood.entity.DimPost;
-import com.aiinpocket.webredgood.entity.DimUser;
-import com.aiinpocket.webredgood.entity.FactUserLike;
-import com.aiinpocket.webredgood.repository.FactUserLikeRepository;
-import com.aiinpocket.webredgood.repository.InfluencerRepository;
-import com.aiinpocket.webredgood.repository.PostRepository;
-import com.aiinpocket.webredgood.repository.UserRepository;
+import com.aiinpocket.webredgood.dto.RecommendCityResponse;
+import com.aiinpocket.webredgood.entity.*;
+import com.aiinpocket.webredgood.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,14 +22,26 @@ public class RecommendationService {
     private final PostRepository postRepository; //網紅 ID 查網紅貼文
     private final FactUserLikeRepository factUserLikeRepository; //貼文 ID 查按讚紀錄
     private final UserRepository userRepository; //user_id 列表查用戶縣市
+    private final PostTagRepository postTagRepository; //標籤跟貼文的篩選
 
-    public FollowerDistributionResponse getFollowerDistribution(Long influencerId){
-        log.info("開始查找網紅的粉絲分布, influencerId={} ", influencerId);
+    // 沒有tag
+    public FollowerDistributionResponse getFollowerDistribution(Long influencerId) {
+        return getFollowerDistributionInternal(influencerId, null);
+    }
+
+    // 有tag
+    public FollowerDistributionResponse getFollowerDistributionByTag(Long influencerId, Long tagId){
+        return  getFollowerDistributionInternal(influencerId, tagId);
+    }
+
+    public FollowerDistributionResponse getFollowerDistributionInternal(Long influencerId, Long tagId)
+    {
+        log.info("開始查找網紅的粉絲分布, influencerId={}, tagId={}", influencerId, tagId);
 
         Optional<DimInfluencer> influencerOpt = influencerRepository.findById(influencerId);
 
         if (influencerOpt.isEmpty()){
-            log.warn("網紅不存在, influencerId: " + influencerId);
+            log.warn("網紅不存在, influencerId={} " + influencerId);
             return null;
         }
 
@@ -49,17 +56,34 @@ public class RecommendationService {
         List<Long> postIds = posts.stream().map(DimPost::getId).toList();
         List<FactUserLike> likes = factUserLikeRepository.findByPostIdIn(postIds);
 
-        List<Long> disrinctUserIds = likes.stream().map(FactUserLike::getUserId)
-                .distinct().toList();
+        // 找有該tag的postId，再保留貼文按讚
+        if (tagId != null){
+            List<Long> postIdsWithTag = postTagRepository.findByPostIdIn(postIds).stream()
+                    .filter(postTag -> postTag.getTagId().equals(tagId))
+                    .map(PostTag::getPostId)
+                    .distinct()
+                    .toList();
+            likes = likes.stream()
+                    .filter(like -> postIdsWithTag.contains(like.getPostId()))
+                    .toList();
+        }
+
+
+        List<Long> disrinctUserIds = likes.stream()
+                .map(FactUserLike::getUserId)
+                .distinct()
+                .toList();
         if (disrinctUserIds.isEmpty()){
-            log.info("網紅該貼文尚無按讚, influencerId={}"+ influencerId);
+            log.info("網紅該貼文尚無或沒有符合tag的按讚，, influencerId={}"+ influencerId);
             return new FollowerDistributionResponse(influencer.getName(), 0L, List.of());
         }
 
         List<DimUser> users = userRepository.findAllById(disrinctUserIds);
         long total = users.size();
 
-        var cityToCount = users.stream().collect(Collectors.groupingBy(DimUser::getCity, Collectors.counting()));
+        var cityToCount = users.stream()
+                .collect(Collectors
+                        .groupingBy(DimUser::getCity, Collectors.counting()));
 
         List<CityDistributionDto> distribution = cityToCount.entrySet().stream()
                 .map(e -> new CityDistributionDto(
@@ -73,4 +97,36 @@ public class RecommendationService {
         log.info("粉絲分布查詢完成, influencerId={} , 總人數={} , 縣市數={} ", influencerId, total, distribution.size());
         return new FollowerDistributionResponse(influencer.getName(), total, distribution);
     }
+
+    // 推薦活動舉辦城市，取粉絲分布第一名，用tag篩選
+    public RecommendCityResponse recommendCity(Long influencerId, Long tagId){
+        log.info("開始推薦活動地點, influencerId={}, tagId={} ", influencerId, tagId);
+
+        FollowerDistributionResponse followerDistributionResponse = tagId != null
+                ? getFollowerDistributionByTag(influencerId, tagId)
+                : getFollowerDistribution(influencerId);
+
+        if (followerDistributionResponse == null){
+            log.warn("無法推薦，因為網紅不存在, influencerId={}", influencerId);
+            return null;
+        }
+        // 分布可能是null或是空[]
+        if (followerDistributionResponse.getDistribution() == null || followerDistributionResponse.getDistribution().isEmpty()){
+            log.info("無法推薦，因為沒有粉絲分布資料, influencerId={}", influencerId);
+            return new RecommendCityResponse();
+        }
+
+        CityDistributionDto cityDistributionDto = followerDistributionResponse.getDistribution().get(0);
+        double confidence = cityDistributionDto.getPercentage() != null ? cityDistributionDto.getPercentage() / 100.0 : 0.0;
+        String reason = String.format("該城市粉絲數量最多，占%.1f%% ", cityDistributionDto.getPercentage());
+
+
+        log.info("推薦成功，influencerId={}, 推薦城市={}, 信心分數={}", influencerId, cityDistributionDto.getCity(), confidence);
+        return new RecommendCityResponse(
+                cityDistributionDto.getCity(),
+                reason,
+                confidence
+        );
+    }
+
 }
