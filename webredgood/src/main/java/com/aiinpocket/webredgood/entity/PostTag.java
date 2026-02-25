@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "post_tag")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(PostTagId.class)

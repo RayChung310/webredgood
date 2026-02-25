@@ -3,7 +3,8 @@ package com.aiinpocket.webredgood.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CityDistributionDto {

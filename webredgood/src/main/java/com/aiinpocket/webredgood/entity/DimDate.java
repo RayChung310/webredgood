@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "dim_date")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class DimDate {

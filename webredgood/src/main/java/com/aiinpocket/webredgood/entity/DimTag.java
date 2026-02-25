@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "dim_tag")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class DimTag {

@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "fact_user_like")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class FactUserLike {

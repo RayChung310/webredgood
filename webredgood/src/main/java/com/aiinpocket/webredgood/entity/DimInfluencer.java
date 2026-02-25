@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "dim_influencer")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class DimInfluencer {

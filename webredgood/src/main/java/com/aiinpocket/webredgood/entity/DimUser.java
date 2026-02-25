@@ -7,7 +7,8 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "dim_user")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class DimUser {

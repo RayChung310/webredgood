@@ -7,7 +7,8 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "dim_post")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class DimPost {

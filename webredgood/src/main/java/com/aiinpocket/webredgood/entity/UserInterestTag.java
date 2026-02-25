@@ -7,7 +7,8 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "user_interest_tag")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(UserInterestTagId.class)
