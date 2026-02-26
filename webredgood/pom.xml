@@ -8,7 +8,7 @@
         <version>4.0.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.practice</groupId>
+    <groupId>com.aiinpocket</groupId>
     <artifactId>webredgood</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>webredgood</name>

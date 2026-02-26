@@ -33,7 +33,7 @@ public class InfluencerController {
     @GetMapping("/{id}/recommend-city")
     public ResponseEntity<RecommendCityResponse> recommendCity(
             @Parameter(description = "網紅ID") @PathVariable Long id,
-            @Parameter(description = "過濾粉絲") @RequestParam(required = false) Long tag){
+            @Parameter(description = "(選填)標籤ID") @RequestParam(required = false) Long tag){
         RecommendCityResponse body = recommendationService.recommendCity(id, tag);
         if (body == null){
             return ResponseEntity.notFound().build();
