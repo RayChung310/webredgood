@@ -41,7 +41,7 @@ public class RecommendationService {
         Optional<DimInfluencer> influencerOpt = influencerRepository.findById(influencerId);
 
         if (influencerOpt.isEmpty()){
-            log.warn("網紅不存在, influencerId={} " + influencerId);
+            log.warn("網紅不存在, influencerId={} " , influencerId);
             return null;
         }
 
@@ -49,7 +49,7 @@ public class RecommendationService {
 
         List<DimPost> posts = postRepository.findByInfluencerId(influencerId);
         if(posts.isEmpty()){
-            log.info("該網紅尚無貼文, influencerId={} " + influencerId);
+            log.info("該網紅尚無貼文, influencerId={} ", influencerId);
             return new FollowerDistributionResponse(influencer.getName(), 0L, List.of());
         }
 
@@ -74,7 +74,7 @@ public class RecommendationService {
                 .distinct()
                 .toList();
         if (disrinctUserIds.isEmpty()){
-            log.info("網紅該貼文尚無或沒有符合tag的按讚，, influencerId={}"+ influencerId);
+            log.info("網紅該貼文尚無或沒有符合tag的按讚，, influencerId={}", influencerId);
             return new FollowerDistributionResponse(influencer.getName(), 0L, List.of());
         }
 
@@ -113,7 +113,11 @@ public class RecommendationService {
         // 分布可能是null或是空[]
         if (followerDistributionResponse.getDistribution() == null || followerDistributionResponse.getDistribution().isEmpty()){
             log.info("無法推薦，因為沒有粉絲分布資料, influencerId={}", influencerId);
-            return new RecommendCityResponse();
+            return new RecommendCityResponse(
+                    null,
+                    "因為沒有粉絲分布資料，無法推薦活動地點",
+                    0.0
+            );
         }
 
         CityDistributionDto cityDistributionDto = followerDistributionResponse.getDistribution().get(0);
