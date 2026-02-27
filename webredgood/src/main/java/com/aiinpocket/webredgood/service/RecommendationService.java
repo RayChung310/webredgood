@@ -54,7 +54,7 @@ public class RecommendationService {
         }
 
         List<Long> postIds = posts.stream().map(DimPost::getId).toList();
-        List<FactUserLike> likes = factUserLikeRepository.findByPostIdIn(postIds);
+        List<FactUserLike> likes = factUserLikeRepository.findByPost_IdIn(postIds);
 
         // 找有該tag的postId，再保留貼文按讚
         if (tagId != null){

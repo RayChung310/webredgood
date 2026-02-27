@@ -16,21 +16,34 @@ public class FactUserLike {
     @Column(name = "like_id")
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private DimUser user;
 
-    @Column(name = "post_id")
-    private Long postId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private DimPost post;
 
-    @Column(name = "tag_id")
-    private Long tagId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tag_id")
+    private DimTag tag;
 
-    @Column(name = "location_id")
-    private Long locationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    private DimLocation location;
 
-    @Column(name = "date_id")
-    private Long dateId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "date_id")
+    private DimDate date;
 
     @Column(name = "like_count")
     private Integer likeCount;
+
+
+    public Long getUserId(){return user != null ? user.getId() : null;}
+    public Long getPostId(){return post != null ? post.getId() : null;}
+    public Long getTagId(){return tag != null ? tag.getId() : null;}
+    public Long getLocationId(){return location != null ? location.getId() : null;}
+    public Long getDateId(){return date != null ? date.getId() : null;}
+
 }

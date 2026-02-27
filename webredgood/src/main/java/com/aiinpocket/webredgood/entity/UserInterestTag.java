@@ -19,8 +19,12 @@ public class UserInterestTag {
     private Long userId;
 
     @Id
-    @Column(name = "tag_id")
+    @Column(name="tag_id")
     private Long tagId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tag_id", insertable = false, updatable = false)
+    private DimTag tag;
 
     @Column(name = "weight", columnDefinition = "numeric")
     private Double weight;

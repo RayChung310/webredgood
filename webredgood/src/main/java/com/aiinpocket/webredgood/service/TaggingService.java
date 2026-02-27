@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -24,13 +25,15 @@ public class TaggingService {
     private final FactUserLikeRepository factUserLikeRepository;
     private final UserInterestTagRepository userInterestTagRepository;
     private final DateRepository dateRepository;
+    private final TagRepository tagRepository;
+    private final LocationRepository locationRepository;
 
     @Transactional
     public boolean recordLike(Long userId, Long postId){
         log.info("紀錄按讚, userId={}, postId={}", userId, postId);
 
         // 重複按讚的情況
-        if (factUserLikeRepository.findFirstByUserIdAndPostId(userId, postId).isPresent()){
+        if (factUserLikeRepository.findFirstByUser_IdAndPost_Id(userId, postId).isPresent()){
             log.debug("重複按讚的話，僅更新興趣的權重");
             updateUserInterestTagsForPost(userId, postId);
             return true;
@@ -52,16 +55,19 @@ public class TaggingService {
         List<PostTag> postTags = postTagRepository.findByPostIdIn(List.of(postId));
         Long firstTagId = postTags.isEmpty() ? null : postTags.get(0).getTagId();
         Long locationId = dimUser.getLocationId();
-        Long dateId = 1L;
+        // 依照當前日期動態查詢
+        LocalDate today = LocalDate.now();
+        Optional<DimDate> dateOptional = dateRepository.findByFullDate(today);
+        Long dateId = dateOptional.map(DimDate::getId).orElse(1L);
 
 
         // 按讚紀錄儲存
         FactUserLike factUserLike = new FactUserLike();
-        factUserLike.setUserId(userId);
-        factUserLike.setPostId(postId);
-        factUserLike.setTagId(firstTagId);
-        factUserLike.setLocationId(locationId);
-        factUserLike.setDateId(dateId);
+        factUserLike.setUser(userRepository.getReferenceById(userId));
+        factUserLike.setPost(postRepository.getReferenceById(postId));
+        factUserLike.setTag(firstTagId != null ? tagRepository.getReferenceById(firstTagId) : null);
+        factUserLike.setLocation(locationId != null ? locationRepository.getReferenceById(locationId) : null);
+        factUserLike.setDate(dateRepository.getReferenceById(dateId));
         factUserLike.setLikeCount(1);
         factUserLikeRepository.save(factUserLike);
 
@@ -72,8 +78,8 @@ public class TaggingService {
 
     private void updateUserInterestTagsForPost(Long userId, Long postId){
         List<PostTag> postTags = postTagRepository.findByPostIdIn(List.of(postId)); // 取得貼文所有標籤
-        // 時間加八小時
-        Instant now = Instant.now().plus(8, java.time.temporal.ChronoUnit.HOURS);
+        // 時間時區處理
+        Instant now = java.time.ZonedDateTime.now(java.time.ZoneId.of("Asia/Taipei")).toInstant();
 
         for(PostTag postTag : postTags){
             Long tagId = postTag.getTagId();

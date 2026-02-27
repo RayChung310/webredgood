@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 public class TagCityService {
 
     private final FactUserLikeRepository factUserLikeRepository;
-    private final UserRepository userRepository;
     private final TagRepository tagRepository;
 
     // 判斷tagId
@@ -30,20 +29,18 @@ public class TagCityService {
             return null;
         }
 
-        List<FactUserLike> like = factUserLikeRepository.findByTagId(tagId);
-        List<Long> userId = like.stream()
-                .map(FactUserLike::getUserId)
-                .distinct() // 去重，看總人數
-                .toList();
-        if (userId.isEmpty()){
+        List<FactUserLike> like = factUserLikeRepository.findByTag_Id(tagId);
+        if (like.isEmpty()){
             log.info("該標籤尚無按讚資料, tagId為={}", tagId);
             return List.of(); // 返回空列表
         }
 
-        List<DimUser> user = userRepository.findAllById(userId);
-        long total = user.size();
+        var cityCount = like.stream()
+                .map(FactUserLike::getUser)
+                .filter(u -> u != null && u.getCity() != null)
+                .collect(Collectors.groupingBy(com.aiinpocket.webredgood.entity.DimUser::getCity, Collectors.counting()));
 
-        var cityCount = user.stream().collect(Collectors.groupingBy(DimUser::getCity, Collectors.counting()));
+        long total = cityCount.values().stream().mapToLong(Long::longValue).sum();
         List<CityRank> result = cityCount.entrySet().stream()
                 .map(e -> new CityRank(
                         e.getKey(),

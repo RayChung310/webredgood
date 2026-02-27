@@ -19,5 +19,5 @@ public class EventSuggestResponse {
     private String reason;
 
     @Schema(description = "信心分數")
-    private Double cinfidenceScore;
+    private Double confidenceScore;
 }
