@@ -5,6 +5,8 @@ import com.aiinpocket.webredgood.dto.FollowerDistributionResponse;
 import com.aiinpocket.webredgood.dto.RecommendCityResponse;
 import com.aiinpocket.webredgood.entity.*;
 import com.aiinpocket.webredgood.repository.*;
+import com.aiinpocket.webredgood.error.BizException;
+import com.aiinpocket.webredgood.error.InfluencerError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,8 +43,7 @@ public class RecommendationService {
         Optional<DimInfluencer> influencerOpt = influencerRepository.findById(influencerId);
 
         if (influencerOpt.isEmpty()){
-            log.warn("網紅不存在, influencerId={} " , influencerId);
-            return null;
+            throw new BizException(InfluencerError.INFLUENCER_NOT_FOUND, influencerId);
         }
 
         DimInfluencer influencer= influencerOpt.get();
@@ -102,10 +103,7 @@ public class RecommendationService {
                 ? getFollowerDistributionByTag(influencerId, tagId)
                 : getFollowerDistribution(influencerId);
 
-        if (followerDistributionResponse == null){
-            log.warn("無法推薦，因為網紅不存在, influencerId={}", influencerId);
-            return null;
-        }
+        // 網紅不存在時 getFollowerDistribution 會直接拋出 BizException，不需要 null check
         // 分布可能是null或是空[]
         if (followerDistributionResponse.getDistribution() == null || followerDistributionResponse.getDistribution().isEmpty()){
             log.info("無法推薦，因為沒有粉絲分布資料, influencerId={}", influencerId);
