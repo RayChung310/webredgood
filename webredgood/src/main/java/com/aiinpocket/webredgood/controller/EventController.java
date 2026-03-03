@@ -24,9 +24,9 @@ public class EventController {
     @GetMapping("/suggest")
     public ResponseEntity<EventSuggestResponse> eventSuggestResponseResponseEntity(
             @Parameter(description = "網紅ID", required = true)
-            @RequestParam Long influencerId,
+            @RequestParam ("influencerId") Long influencerId,
             @Parameter(description = "(選填)標籤ID")
-            @RequestParam(required = false) Long tag){
+            @RequestParam(value = "tag", required = false) Long tag){
         EventSuggestResponse eventSuggestResponse = eventSuggestService.eventSuggestResponse(influencerId, tag);
         if (eventSuggestResponse == null){
             return ResponseEntity.notFound().build();

@@ -21,7 +21,7 @@ public class InfluencerController {
     @Operation(summary = "查詢粉絲分布", description = "取得網紅粉絲的縣市分布")
     @GetMapping("/{id}/followers/distribution")
     public ResponseEntity<FollowerDistributionResponse> getFollowerDistribution
-            (@Parameter(description = "網紅ID") @PathVariable Long id){
+            (@Parameter(description = "網紅ID") @PathVariable("id") Long id){
                     FollowerDistributionResponse body = recommendationService.getFollowerDistribution(id);
                 if(body == null){
                     return ResponseEntity.notFound().build();
@@ -32,8 +32,8 @@ public class InfluencerController {
     @Operation(summary = "推薦城市", description = "依照粉絲分布推薦舉辦城市，可用tag篩選")
     @GetMapping("/{id}/recommend-city")
     public ResponseEntity<RecommendCityResponse> recommendCity(
-            @Parameter(description = "網紅ID") @PathVariable Long id,
-            @Parameter(description = "(選填)標籤ID") @RequestParam(required = false) Long tag){
+            @Parameter(description = "網紅ID") @PathVariable("id") Long id,
+            @Parameter(description = "(選填)標籤ID") @RequestParam(value = "tag", required = false) Long tag){
         RecommendCityResponse body = recommendationService.recommendCity(id, tag);
         if (body == null){
             return ResponseEntity.notFound().build();

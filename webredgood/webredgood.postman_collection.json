@@ -1,0 +1,256 @@
+{
+  "info": {
+    "_postman_id": "064aab3a-5c48-4ab6-8db9-534bacb4a1be",
+    "name": "webredgood",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "41601231"
+  },
+  "item": [
+    {
+      "name": "Influencer API",
+      "item": [
+        {
+          "name": "查詢粉絲分佈 - 正常情境",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/influencers/1/followers/distribution",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "influencers",
+                "1",
+                "followers",
+                "distribution"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "查詢粉絲分佈 - 網紅不存在",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/influencers/999/followers/distribution",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "influencers",
+                "999",
+                "followers",
+                "distribution"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "推薦活動地點 - 正常情境",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/influencers/1/recommend-city",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "influencers",
+                "1",
+                "recommend-city"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "推薦活動地點 - 帶 Tag 過濾",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/influencers/1/recommend-city?tag=3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "influencers",
+                "1",
+                "recommend-city"
+              ],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "3"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User API",
+      "item": [
+        {
+          "name": "用戶按讚貼文 - 正常情境",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"postId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/users/1/likes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users",
+                "1",
+                "likes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "用戶按讚貼文 - 重複按讚",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"postId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/users/1/likes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "users",
+                "1",
+                "likes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "查詢用戶興趣標籤",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analytics API",
+      "item": [
+        {
+          "name": "縣市聚合查詢",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/analytics/star-schema/city-summary",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "analytics",
+                "star-schema",
+                "city-summary"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "標籤聚合查詢",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/analytics/star-schema/tag-summary",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "analytics",
+                "star-schema",
+                "tag-summary"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Event API",
+      "item": [
+        {
+          "name": "推薦活動地點與主題 - 正常情境",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "推薦活動地點與主題 - 無資料情境",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

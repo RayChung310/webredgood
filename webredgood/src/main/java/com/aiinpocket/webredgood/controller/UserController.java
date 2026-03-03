@@ -41,7 +41,7 @@ public class UserController {
      @GetMapping("/{id}/tags")
      public ResponseEntity<List<UserTagResponse>> getUserTags(
              @Parameter(description = "用戶ID")
-             @PathVariable Long id){
+             @PathVariable("id") Long id){
          List<UserTagResponse> userTagResponseList = userTagService.getUserTags(id);
          if (userTagResponseList == null){
              return ResponseEntity.notFound().build();

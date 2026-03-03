@@ -26,7 +26,7 @@ public class TagController {
     @GetMapping("/{tagId}/city-ranking")
     public ResponseEntity<List<CityRank>> getCityRank (
             @Parameter(description = "標籤ID")
-            @PathVariable Long tagId){
+            @PathVariable("tagId") Long tagId){
         List<CityRank> body = tagCityService.getCityRankByTag(tagId);
         if (body == null) {
             return ResponseEntity.notFound().build();
