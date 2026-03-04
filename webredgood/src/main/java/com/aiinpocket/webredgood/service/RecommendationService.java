@@ -59,7 +59,10 @@ public class RecommendationService {
 
         // 找有該tag的postId，再保留貼文按讚
         if (tagId != null){
-            List<Long> postIdsWithTag = postTagRepository.findPostsIdByPostIdInAndTagId(postIds, tagId);
+            List<Long> postIdsWithTag = postTagRepository.findByPostIdInAndTagId(postIds, tagId)
+                    .stream().map(PostTag::getPostId)
+                    .toList();
+
             likes = likes.stream()
                     .filter(like -> postIdsWithTag.contains(like.getPostId()))
                     .toList();
