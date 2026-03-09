@@ -28,23 +28,27 @@ public class AnalyticsService {
     public List<CitySummary> citySummaryList() {
         log.info("Star Schema 聚合: 依照城市 (Java Stream + GROUPING BY)");
 
-        return factUserLikeRepository.findAll().stream()
+        List<CitySummary> result = factUserLikeRepository.findAll().stream()
                 .filter(like -> like.getLocation() != null && like.getLocation().getCityName() != null)
                 .collect(Collectors.groupingBy(like -> like.getLocation().getCityName(), Collectors.counting()))
                 .entrySet().stream().map(entry -> new CitySummary(entry.getKey(), entry.getValue()))
                 .toList();
+        log.info("城市聚合查詢完成, 縣市數={}", result.size());
+        return result;
     }
 
     @Transactional(readOnly = true)
-    public List<TagSummary> tagSummaryList(){
+    public List<TagSummary> tagSummaryList() {
         log.info("Star Schema 聚合: 依照標籤(Java Stream + GROUP BY)");
 
-        return factUserLikeRepository.findAll().stream()
+        List<TagSummary> result = factUserLikeRepository.findAll().stream()
                 .filter(like -> like.getTag() != null && like.getTag().getTagName() != null)
                 .collect(Collectors.groupingBy(like -> like.getTag().getTagName(), Collectors.counting()))
                 .entrySet().stream().map(entry -> new TagSummary(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparingLong(TagSummary::getTotalCount).reversed())
                 .toList();
+        log.info("標籤聚合查詢完成, 標籤數={}", result.size());
+        return result;
 
     }
 }
