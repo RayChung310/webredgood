@@ -33,11 +33,11 @@ public class TaggingService {
     public boolean recordLike(Long userId, Long postId){
         log.info("紀錄按讚, userId={}, postId={}", userId, postId);
 
-        // 重複按讚的情況
-        if (factUserLikeRepository.findFirstByUser_IdAndPost_Id(userId, postId).isPresent()){
-            log.debug("重複按讚的話，僅更新興趣的權重");
-            updateUserInterestTagsForPost(userId, postId);
-            log.info("紀錄按讚結束(重複按讚，已更新興趣權重), userId={}, postId={}", userId, postId);
+        // 有userId 跟 postId，視為已按讚，不增加興趣權重
+        boolean alreadyLiked = factUserLikeRepository.findFirstByUser_IdAndPost_Id(userId, postId).isPresent();
+        if (alreadyLiked){
+            log.debug("用戶已對該貼文按讚，不再增加興趣權重, userId={}, postId={}", userId, postId);
+            log.info("紀錄按讚結果結束(重複按讚，未變更興趣權重), userId={}, postId={}", userId, postId);
             return true;
         }
 
@@ -76,14 +76,16 @@ public class TaggingService {
             factUserLikeRepository.save(factUserLike);
         }
 
-
-        updateUserInterestTagsForPost(userId, postId); // 增加興趣權重
+        // 第一次按讚，增加一次興趣權重
+        updateUserInterestTagsForPost(userId, postId);
         log.info("按讚記錄成功, userId={}, postId={}", userId, postId);
         return true;
     }
 
     private void updateUserInterestTagsForPost(Long userId, Long postId){
-        List<PostTag> postTags = postTagRepository.findByPostIdIn(List.of(postId)); // 取得貼文所有標籤
+
+        // 取得貼文所有標籤
+        List<PostTag> postTags = postTagRepository.findByPostIdIn(List.of(postId));
         // 時間時區處理
         Instant now = java.time.ZonedDateTime.now(java.time.ZoneId.of("Asia/Taipei")).toInstant();
 
@@ -93,7 +95,8 @@ public class TaggingService {
             Optional<UserInterestTag> userInterestTagOptional = userInterestTagRepository.findByUserIdAndTagId(userId, tagId);
             if (userInterestTagOptional.isPresent()){
                 UserInterestTag userInterestTag = userInterestTagOptional.get();
-                userInterestTag.setWeight(userInterestTag.getWeight() == null ? 0.0 : userInterestTag.getWeight() + 1.0 );
+                Double currentWeight = Optional.ofNullable(userInterestTag.getWeight()).orElse(0.0);
+                userInterestTag.setWeight(currentWeight + 1.0);
                 userInterestTag.setLastUpdated(now);
                 userInterestTagRepository.save(userInterestTag);
             }else {
