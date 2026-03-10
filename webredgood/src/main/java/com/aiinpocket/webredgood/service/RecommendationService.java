@@ -78,16 +78,16 @@ public class RecommendationService {
         }
 
 
-        List<Long> disrinctUserIds = likes.stream()
+        List<Long> distinctUserIds = likes.stream()
                 .map(FactUserLike::getUserId)
                 .distinct()
                 .toList();
-        if (disrinctUserIds.isEmpty()){
+        if (distinctUserIds.isEmpty()){
             log.info("網紅該貼文尚無或沒有符合tag的按讚，, influencerId={}", influencerId);
             return new FollowerDistributionResponse(influencer.getName(), 0L, List.of());
         }
 
-        List<DimUser> users = userRepository.findAllById(disrinctUserIds);
+        List<DimUser> users = userRepository.findAllById(distinctUserIds);
         long total = users.size();
 
         var cityToCount = users.stream()

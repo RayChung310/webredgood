@@ -28,7 +28,7 @@ public class AnalyticsController {
 
     @Operation(summary = "依標籤聚合")
     @GetMapping("/tag-summary")
-    public List<TagSummary> tagsummary(){
+    public List<TagSummary> tagSummary(){
         return analyticsService.tagSummaryList();
     }
 
