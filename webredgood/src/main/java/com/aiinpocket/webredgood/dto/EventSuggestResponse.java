@@ -10,7 +10,7 @@ import lombok.*;
 public class EventSuggestResponse {
 
     @Schema(description = "推薦城市")
-    private String recommendCity;
+    private String recommendedCity;
 
     @Schema(description = "推薦標籤")
     private String recommendedTag;

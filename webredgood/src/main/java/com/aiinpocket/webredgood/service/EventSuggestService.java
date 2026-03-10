@@ -48,7 +48,7 @@ public class EventSuggestService {
                 recommendCityResponse.getReason(),
                 recommendCityResponse.getConfidenceScore()
         );
-        log.info("推薦活動完成, 推薦城市={}, 推薦標籤={}",eventSuggestResponse.getRecommendCity(), eventSuggestResponse.getRecommendedTag());
+        log.info("推薦活動完成, 推薦城市={}, 推薦標籤={}",eventSuggestResponse.getRecommendedCity(), eventSuggestResponse.getRecommendedTag());
         return eventSuggestResponse;
     }
 

@@ -112,7 +112,14 @@ SELECT
     l.county_name,
     l.location_id
 FROM generate_series(1, 50) i
-         CROSS JOIN LATERAL (SELECT * FROM dim_location ORDER BY random() LIMIT 1) l;
+JOIN LATERAL (
+    SELECT *
+    FROM dim_location
+    ORDER BY location_id
+    OFFSET ((i - 1) % (SELECT COUNT(*) FROM dim_location)) ROWS
+    LIMIT 1
+    ) AS l ON TRUE;
+
 
 -- ==========  插入 30 篇貼文 ==========
 INSERT INTO dim_post (influencer_id, title, content) VALUES
@@ -147,9 +154,27 @@ SELECT
     d.date_id,
     1
 FROM generate_series(1, 50) i
-         CROSS JOIN LATERAL (SELECT * FROM dim_user ORDER BY random() LIMIT 1) u
-CROSS JOIN LATERAL (SELECT * FROM post_tag ORDER BY random() LIMIT 1) pt
-    CROSS JOIN LATERAL (SELECT * FROM dim_date ORDER BY random() LIMIT 1) d;
+         JOIN LATERAL (
+    SELECT user_id, location_id
+    FROM dim_user
+    ORDER BY user_id
+    OFFSET ((i - 1) % (SELECT COUNT(*) FROM dim_user)) ROWS
+    LIMIT 1
+    ) AS u ON TRUE
+    JOIN LATERAL (
+    SELECT post_id, tag_id
+    FROM post_tag
+    ORDER BY post_id, tag_id
+    OFFSET ((i - 1) % (SELECT COUNT(*) FROM post_tag)) ROWS
+    LIMIT 1
+    ) AS pt ON TRUE
+    JOIN LATERAL (
+    SELECT date_id
+    FROM dim_date
+    ORDER BY date_id
+    OFFSET ((i - 1) % (SELECT COUNT(*) FROM dim_date)) ROWS
+    LIMIT 1
+    ) AS d ON TRUE;
 
 -- ==========  用戶興趣權重 (user_interest_tag) ==========
 INSERT INTO user_interest_tag (user_id, tag_id, weight, last_updated)

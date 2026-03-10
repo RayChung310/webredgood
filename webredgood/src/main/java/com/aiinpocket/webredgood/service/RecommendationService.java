@@ -59,7 +59,7 @@ public class RecommendationService {
 
         List<DimPost> posts = postRepository.findByInfluencerId(influencerId);
         if(posts.isEmpty()){
-            log.info("該網紅尚無貼文, influencerId={} ", influencerId);
+            log.info("該網紅尚無貼文, influencerId={}", influencerId);
             return new FollowerDistributionResponse(influencer.getName(), 0L, List.of());
         }
 
@@ -103,14 +103,14 @@ public class RecommendationService {
                 .sorted((a,b) -> Long.compare(b.getCount(), a.getCount()))
                 .collect(Collectors.toList());
 
-        log.info("粉絲分布查詢完成, influencerId={} , 總人數={} , 縣市數={} ", influencerId, total, distribution.size());
+        log.info("粉絲分布查詢完成, influencerId={} , 總人數={} , 縣市數={}", influencerId, total, distribution.size());
         return new FollowerDistributionResponse(influencer.getName(), total, distribution);
     }
 
     // 推薦活動舉辦城市，取粉絲分布第一名，用tag篩選
     @Transactional(readOnly = true)
     public RecommendCityResponse recommendCity(Long influencerId, Long tagId){
-        log.info("開始推薦活動地點, influencerId={}, tagId={} ", influencerId, tagId);
+        log.info("開始推薦活動地點, influencerId={}, tagId={}", influencerId, tagId);
 
         FollowerDistributionResponse followerDistributionResponse = tagId != null
                 ? getFollowerDistributionByTag(influencerId, tagId)
@@ -129,7 +129,7 @@ public class RecommendationService {
 
         CityDistributionDto cityDistributionDto = followerDistributionResponse.getDistribution().get(0);
         double confidence = cityDistributionDto.getPercentage() != null ? cityDistributionDto.getPercentage() / 100.0 : 0.0;
-        String reason = String.format("該城市粉絲數量最多，占%.1f%% ", cityDistributionDto.getPercentage());
+        String reason = String.format("該城市粉絲數量最多，占%.1f%%", cityDistributionDto.getPercentage());
 
 
         log.info("推薦成功，influencerId={}, 推薦城市={}, 信心分數={}", influencerId, cityDistributionDto.getCity(), confidence);
