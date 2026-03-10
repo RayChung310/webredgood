@@ -27,11 +27,7 @@ public class TagController {
     public ResponseEntity<List<CityRank>> getCityRank (
             @Parameter(description = "標籤ID")
             @PathVariable("tagId") Long tagId){
-        List<CityRank> body = tagCityService.getCityRankByTag(tagId);
-        if (body == null) {
-            return ResponseEntity.notFound().build();
-        }
-            return ResponseEntity.ok(body);
+            return ResponseEntity.ok(tagCityService.getCityRankByTag(tagId));
     }
 
 

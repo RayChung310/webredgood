@@ -27,11 +27,7 @@ public class EventController {
             @RequestParam ("influencerId") Long influencerId,
             @Parameter(description = "(選填)標籤ID")
             @RequestParam(value = "tag", required = false) Long tag){
-        EventSuggestResponse eventSuggestResponse = eventSuggestService.eventSuggestResponse(influencerId, tag);
-        if (eventSuggestResponse == null){
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(eventSuggestResponse);
+        return ResponseEntity.ok(eventSuggestService.eventSuggestResponse(influencerId, tag));
     }
 
 

@@ -3,6 +3,8 @@ package com.aiinpocket.webredgood.service;
 import com.aiinpocket.webredgood.dto.CityRank;
 import com.aiinpocket.webredgood.entity.DimUser;
 import com.aiinpocket.webredgood.entity.FactUserLike;
+import com.aiinpocket.webredgood.error.BizException;
+import com.aiinpocket.webredgood.error.TagError;
 import com.aiinpocket.webredgood.repository.FactUserLikeRepository;
 import com.aiinpocket.webredgood.repository.TagRepository;
 import com.aiinpocket.webredgood.repository.UserRepository;
@@ -25,8 +27,7 @@ public class TagCityService {
     public List<CityRank> getCityRankByTag(Long tagId){
         log.info("依標籤查詢城市排名, tagId為={}", tagId);
         if (tagRepository.findById(tagId).isEmpty()){
-            log.warn("標籤不存在, tagId為={}", tagId);
-            return null;
+            throw new BizException(TagError.TAG_NOT_FOUND, tagId);
         }
 
         List<FactUserLike> like = factUserLikeRepository.findByTag_Id(tagId);

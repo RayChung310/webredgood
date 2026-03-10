@@ -7,6 +7,7 @@ import com.aiinpocket.webredgood.service.UserTagService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,19 +23,15 @@ public class UserController {
      private final TaggingService taggingService;
      private final UserTagService userTagService;
 
-    @Operation(summary = "紀錄用戶按讚貼文", description = "紀錄按讚並更新用戶興趣權重")
+     @Operation(summary = "紀錄用戶按讚貼文", description = "紀錄按讚並更新用戶興趣權重")
      @PostMapping("/{id}/likes")
      public ResponseEntity<Void> recordLike(
              @Parameter(description = "用戶ID")
              @PathVariable("id") Long id,
-             @RequestBody LikeRequest likeRequest){
-         // 傳入的RequestBody 或 PostId為空
-         if (likeRequest == null || likeRequest.getPostId() == null) {
-             return ResponseEntity.badRequest().build();
-         }
+             @RequestBody @Valid LikeRequest likeRequest){
 
-         boolean ok = taggingService.recordLike(id, likeRequest.getPostId());
-         return ok ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+         taggingService.recordLike(id, likeRequest.getPostId());
+         return ResponseEntity.ok().build();
      }
 
      @Operation(summary = "查詢用戶興趣標籤", description = "取得該用戶的興趣標籤與權重")
@@ -42,11 +39,8 @@ public class UserController {
      public ResponseEntity<List<UserTagResponse>> getUserTags(
              @Parameter(description = "用戶ID")
              @PathVariable("id") Long id){
-         List<UserTagResponse> userTagResponseList = userTagService.getUserTags(id);
-         if (userTagResponseList == null){
-             return ResponseEntity.notFound().build();
-         }
-         return ResponseEntity.ok(userTagResponseList);
+
+         return ResponseEntity.ok( userTagService.getUserTags(id));
      }
 
 }

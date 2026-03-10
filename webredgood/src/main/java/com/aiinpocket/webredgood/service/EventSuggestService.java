@@ -19,10 +19,7 @@ public class EventSuggestService {
     public EventSuggestResponse eventSuggestResponse(Long influencerId, Long tagId){
         log.info("推薦活動與主題, influencerId={}, tagId={}", influencerId, tagId);
         RecommendCityResponse recommendCityResponse = recommendationService.recommendCity(influencerId, tagId);
-        if (recommendCityResponse == null){
-            log.warn("無法推薦，這位網紅不存在, influencerId={}", influencerId);
-            return null;
-        }
+
         String tagName = null;
         if (tagId != null){
             tagName = tagRepository.findById(tagId).map(DimTag::getTagName).orElse(null);

@@ -1,6 +1,9 @@
 package com.aiinpocket.webredgood.service;
 
 import com.aiinpocket.webredgood.entity.*;
+import com.aiinpocket.webredgood.error.BizException;
+import com.aiinpocket.webredgood.error.PostError;
+import com.aiinpocket.webredgood.error.UserError;
 import com.aiinpocket.webredgood.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,9 +44,11 @@ public class TaggingService {
         Optional<DimUser> userOptional = userRepository.findById(userId);
         Optional<DimPost> postOptional = postRepository.findById(postId);
 
-        if (userOptional.isEmpty() || postOptional.isEmpty()){
-            log.warn("用戶或貼文不存在, userId={}, postId={}", userId, postId);
-            return false;
+        if (userOptional.isEmpty()) {
+            throw new BizException(UserError.USER_NOT_FOUND, userId);
+        }
+        if (postOptional.isEmpty()) {
+            throw new BizException(PostError.POST_NOT_FOUND, postId);
         }
 
         // 存在的情況
@@ -53,23 +56,25 @@ public class TaggingService {
         DimPost dimPost = postOptional.get();
 
         List<PostTag> postTags = postTagRepository.findByPostIdIn(List.of(postId));
-        Long firstTagId = postTags.isEmpty() ? null : postTags.get(0).getTagId();
         Long locationId = dimUser.getLocationId();
         // 依照當前日期動態查詢
         LocalDate today = LocalDate.now();
         Optional<DimDate> dateOptional = dateRepository.findByFullDate(today);
         Long dateId = dateOptional.map(DimDate::getId).orElse(1L);
 
+        // 改為貼文有幾個標籤，就存幾筆 fact_user_like
+        for (PostTag postTag : postTags){
+            Long tagId = postTag.getTagId();
+            FactUserLike factUserLike = new FactUserLike();
+            factUserLike.setUser(userRepository.getReferenceById(userId));
+            factUserLike.setPost(postRepository.getReferenceById(postId));
+            factUserLike.setTag(tagRepository.getReferenceById(tagId));
+            factUserLike.setLocation(locationId != null ? locationRepository.getReferenceById(locationId) : null);
+            factUserLike.setDate(dateRepository.getReferenceById(dateId));
+            factUserLike.setLikeCount(1);
+            factUserLikeRepository.save(factUserLike);
+        }
 
-        // 按讚紀錄儲存
-        FactUserLike factUserLike = new FactUserLike();
-        factUserLike.setUser(userRepository.getReferenceById(userId));
-        factUserLike.setPost(postRepository.getReferenceById(postId));
-        factUserLike.setTag(firstTagId != null ? tagRepository.getReferenceById(firstTagId) : null);
-        factUserLike.setLocation(locationId != null ? locationRepository.getReferenceById(locationId) : null);
-        factUserLike.setDate(dateRepository.getReferenceById(dateId));
-        factUserLike.setLikeCount(1);
-        factUserLikeRepository.save(factUserLike);
 
         updateUserInterestTagsForPost(userId, postId); // 增加興趣權重
         log.info("按讚記錄成功, userId={}, postId={}", userId, postId);

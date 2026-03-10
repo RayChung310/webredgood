@@ -3,6 +3,8 @@ package com.aiinpocket.webredgood.service;
 import com.aiinpocket.webredgood.dto.UserTagResponse;
 import com.aiinpocket.webredgood.entity.DimTag;
 import com.aiinpocket.webredgood.entity.UserInterestTag;
+import com.aiinpocket.webredgood.error.BizException;
+import com.aiinpocket.webredgood.error.UserError;
 import com.aiinpocket.webredgood.repository.TagRepository;
 import com.aiinpocket.webredgood.repository.UserInterestTagRepository;
 import com.aiinpocket.webredgood.repository.UserRepository;
@@ -25,8 +27,7 @@ public class UserTagService {
     public List<UserTagResponse> getUserTags(Long userId){
         log.info("查詢用戶興趣標籤, userId={}", userId);
         if (userRepository.findById(userId).isEmpty()){
-            log.warn("用戶不存在, userId={}", userId);
-            return null;
+            throw new BizException(UserError.USER_NOT_FOUND, userId);
         }
 
         List<UserInterestTag> userInterestTagList = userInterestTagRepository.findByUserId(userId);
