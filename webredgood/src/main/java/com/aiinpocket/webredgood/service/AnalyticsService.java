@@ -2,20 +2,13 @@ package com.aiinpocket.webredgood.service;
 
 import com.aiinpocket.webredgood.dto.CitySummary;
 import com.aiinpocket.webredgood.dto.TagSummary;
-import com.aiinpocket.webredgood.entity.FactUserLike;
 import com.aiinpocket.webredgood.repository.FactUserLikeRepository;
-import com.aiinpocket.webredgood.repository.LocationRepository;
-import com.aiinpocket.webredgood.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -26,27 +19,17 @@ public class AnalyticsService {
 
     @Transactional(readOnly = true)
     public List<CitySummary> citySummaryList() {
-        log.info("Star Schema 聚合: 依照城市 (Java Stream + GROUPING BY)");
-
-        List<CitySummary> result = factUserLikeRepository.findAll().stream()
-                .filter(like -> like.getLocation() != null && like.getLocation().getCityName() != null)
-                .collect(Collectors.groupingBy(like -> like.getLocation().getCityName(), Collectors.counting()))
-                .entrySet().stream().map(entry -> new CitySummary(entry.getKey(), entry.getValue()))
-                .toList();
+        log.info("Star Schema 聚合: 依照城市 (DB 端 GROUP BY)");
+        List<CitySummary> result = factUserLikeRepository.getCitySummary();
         log.info("城市聚合查詢完成, 縣市數={}", result.size());
         return result;
     }
 
     @Transactional(readOnly = true)
     public List<TagSummary> tagSummaryList() {
-        log.info("Star Schema 聚合: 依照標籤(Java Stream + GROUP BY)");
+        log.info("Star Schema 聚合: 依照標籤 (DB 端 GROUP BY)");
 
-        List<TagSummary> result = factUserLikeRepository.findAll().stream()
-                .filter(like -> like.getTag() != null && like.getTag().getTagName() != null)
-                .collect(Collectors.groupingBy(like -> like.getTag().getTagName(), Collectors.counting()))
-                .entrySet().stream().map(entry -> new TagSummary(entry.getKey(), entry.getValue()))
-                .sorted(Comparator.comparingLong(TagSummary::getTotalCount).reversed())
-                .toList();
+        List<TagSummary> result = factUserLikeRepository.getTagSummary();
         log.info("標籤聚合查詢完成, 標籤數={}", result.size());
         return result;
 

@@ -3,6 +3,9 @@ package com.aiinpocket.webredgood.repository;
 import com.aiinpocket.webredgood.entity.FactUserLike;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import com.aiinpocket.webredgood.dto.CitySummary;
+import com.aiinpocket.webredgood.dto.TagSummary;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,5 +21,25 @@ public interface FactUserLikeRepository extends JpaRepository<FactUserLike, Long
 
     @EntityGraph(attributePaths = {"user"})
     List<FactUserLike> findByTag_Id(Long tagId);
+
+    @Query("""
+       SELECT new com.aiinpocket.webredgood.dto.CitySummary(l.cityName, COUNT(f))
+       FROM FactUserLike f
+       JOIN f.location l
+       WHERE l.cityName IS NOT NULL
+       GROUP BY l.id, l.cityName
+       ORDER BY COUNT(f) DESC
+       """)
+    List<CitySummary> getCitySummary();
+
+    @Query("""
+       SELECT new com.aiinpocket.webredgood.dto.TagSummary(t.tagName, COUNT(f))
+       FROM FactUserLike f
+       JOIN f.tag t
+       WHERE t.tagName IS NOT NULL
+       GROUP BY t.id, t.tagName
+       ORDER BY COUNT(f) DESC
+       """)
+    List<TagSummary> getTagSummary();
 
 }
