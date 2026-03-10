@@ -7,6 +7,7 @@ import com.aiinpocket.webredgood.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -16,6 +17,7 @@ public class EventSuggestService {
     private final RecommendationService recommendationService;
     private final TagRepository tagRepository;
 
+    @Transactional(readOnly = true)
     public EventSuggestResponse eventSuggestResponse(Long influencerId, Long tagId){
         log.info("推薦活動與主題, influencerId={}, tagId={}", influencerId, tagId);
         RecommendCityResponse recommendCityResponse = recommendationService.recommendCity(influencerId, tagId);

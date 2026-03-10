@@ -10,6 +10,7 @@ import com.aiinpocket.webredgood.error.InfluencerError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,13 +28,21 @@ public class RecommendationService {
     private final PostTagRepository postTagRepository; //標籤跟貼文的篩選
 
     // 沒有tag
+    @Transactional(readOnly = true)
     public FollowerDistributionResponse getFollowerDistribution(Long influencerId) {
-        return getFollowerDistributionInternal(influencerId, null);
+        log.info("查詢粉絲分布(無標籤), influencerId={}", influencerId);
+        FollowerDistributionResponse followerDistributionResponse = getFollowerDistributionInternal(influencerId, null);
+        log.info("查詢粉絲分布結束(無標籤), influencerId={}", influencerId);
+        return followerDistributionResponse;
     }
 
     // 有tag
+    @Transactional(readOnly = true)
     public FollowerDistributionResponse getFollowerDistributionByTag(Long influencerId, Long tagId){
-        return  getFollowerDistributionInternal(influencerId, tagId);
+        log.info("查詢粉絲分布(依照標籤), influencerId={}, tagId={}", influencerId, tagId);
+        FollowerDistributionResponse followerDistributionResponse = getFollowerDistributionInternal(influencerId, tagId);
+        log.info("查詢粉絲分布結束(依照標籤), influencerId={}, tagId={}", influencerId, tagId);
+        return followerDistributionResponse;
     }
 
     public FollowerDistributionResponse getFollowerDistributionInternal(Long influencerId, Long tagId)
@@ -99,6 +108,7 @@ public class RecommendationService {
     }
 
     // 推薦活動舉辦城市，取粉絲分布第一名，用tag篩選
+    @Transactional(readOnly = true)
     public RecommendCityResponse recommendCity(Long influencerId, Long tagId){
         log.info("開始推薦活動地點, influencerId={}, tagId={} ", influencerId, tagId);
 

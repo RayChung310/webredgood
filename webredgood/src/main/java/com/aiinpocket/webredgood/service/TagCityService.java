@@ -11,6 +11,7 @@ import com.aiinpocket.webredgood.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ public class TagCityService {
     private final TagRepository tagRepository;
 
     // 判斷tagId
+    @Transactional(readOnly = true)
     public List<CityRank> getCityRankByTag(Long tagId){
         log.info("依標籤查詢城市排名, tagId為={}", tagId);
         if (tagRepository.findById(tagId).isEmpty()){
@@ -33,6 +35,7 @@ public class TagCityService {
         List<FactUserLike> like = factUserLikeRepository.findByTag_Id(tagId);
         if (like.isEmpty()){
             log.info("該標籤尚無按讚資料, tagId為={}", tagId);
+            log.info("依標籤查詢城市排名結束(無按讚資料), tagId為={}", tagId);
             return List.of(); // 返回空列表
         }
 

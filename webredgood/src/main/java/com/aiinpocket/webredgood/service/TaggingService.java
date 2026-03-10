@@ -37,6 +37,7 @@ public class TaggingService {
         if (factUserLikeRepository.findFirstByUser_IdAndPost_Id(userId, postId).isPresent()){
             log.debug("重複按讚的話，僅更新興趣的權重");
             updateUserInterestTagsForPost(userId, postId);
+            log.info("紀錄按讚結束(重複按讚，已更新興趣權重), userId={}, postId={}", userId, postId);
             return true;
         }
 

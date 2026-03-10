@@ -11,6 +11,7 @@ import com.aiinpocket.webredgood.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ public class UserTagService {
     private final UserInterestTagRepository userInterestTagRepository;
 
     // 得到用戶的興趣標籤
+    @Transactional(readOnly = true)
     public List<UserTagResponse> getUserTags(Long userId){
         log.info("查詢用戶興趣標籤, userId={}", userId);
         if (userRepository.findById(userId).isEmpty()){
