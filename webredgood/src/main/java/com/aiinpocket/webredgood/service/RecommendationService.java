@@ -49,18 +49,16 @@ public class RecommendationService {
     {
         log.info("開始查找網紅的粉絲分布, influencerId={}, tagId={}", influencerId, tagId);
 
-        Optional<DimInfluencer> influencerOpt = influencerRepository.findById(influencerId);
+        // 確認網紅是否存在，不存在則 INF-001
 
-        if (influencerOpt.isEmpty()){
-            throw new BizException(InfluencerError.INFLUENCER_NOT_FOUND, influencerId);
-        }
+        DimInfluencer influencer = influencerRepository.findById(influencerId)
+                .orElseThrow(()-> new BizException(InfluencerError.INFLUENCER_NOT_FOUND, influencerId));
 
-        DimInfluencer influencer= influencerOpt.get();
-
+        // 查詢貼文，若沒有貼文，故沒有粉絲分布資料，則 INF-002
         List<DimPost> posts = postRepository.findByInfluencerId(influencerId);
         if(posts.isEmpty()){
             log.info("該網紅尚無貼文, influencerId={}", influencerId);
-            return new FollowerDistributionResponse(influencer.getName(), 0L, List.of());
+            throw new BizException(InfluencerError.NO_FOLLOWER_DISTRIBUTION, influencerId);
         }
 
         List<Long> postIds = posts.stream().map(DimPost::getId).toList();
@@ -84,7 +82,7 @@ public class RecommendationService {
                 .toList();
         if (distinctUserIds.isEmpty()){
             log.info("網紅該貼文尚無或沒有符合tag的按讚，, influencerId={}", influencerId);
-            return new FollowerDistributionResponse(influencer.getName(), 0L, List.of());
+            throw new BizException(InfluencerError.NO_FOLLOWER_DISTRIBUTION, influencerId);
         }
 
         List<DimUser> users = userRepository.findAllById(distinctUserIds);

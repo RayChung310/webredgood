@@ -1,5 +1,6 @@
 package com.aiinpocket.webredgood.service;
 
+import com.aiinpocket.webredgood.dto.LikeResponse;
 import com.aiinpocket.webredgood.entity.*;
 import com.aiinpocket.webredgood.error.BizException;
 import com.aiinpocket.webredgood.error.PostError;
@@ -30,15 +31,17 @@ public class TaggingService {
     private final LocationRepository locationRepository;
 
     @Transactional
-    public boolean recordLike(Long userId, Long postId){
-        log.info("紀錄按讚, userId={}, postId={}", userId, postId);
+    public LikeResponse recordLike(Long userId, Long postId){
+
+        boolean first = false;
+        boolean tagsUpdated = false;
 
         // 有userId 跟 postId，視為已按讚，不增加興趣權重
         boolean alreadyLiked = factUserLikeRepository.findFirstByUser_IdAndPost_Id(userId, postId).isPresent();
         if (alreadyLiked){
             log.debug("用戶已對該貼文按讚，不再增加興趣權重, userId={}, postId={}", userId, postId);
             log.info("紀錄按讚結果結束(重複按讚，未變更興趣權重), userId={}, postId={}", userId, postId);
-            return true;
+            return new LikeResponse(userId, postId, false, false, "用戶已按過讚");
         }
 
         // 不存在的情況
@@ -79,7 +82,11 @@ public class TaggingService {
         // 第一次按讚，增加一次興趣權重
         updateUserInterestTagsForPost(userId, postId);
         log.info("按讚記錄成功, userId={}, postId={}", userId, postId);
-        return true;
+
+        first = true;
+        tagsUpdated = true;
+
+        return new LikeResponse(userId, postId, first, tagsUpdated, "按讚成功");
     }
 
     private void updateUserInterestTagsForPost(Long userId, Long postId){
