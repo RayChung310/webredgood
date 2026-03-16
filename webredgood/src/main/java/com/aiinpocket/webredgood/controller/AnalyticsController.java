@@ -6,6 +6,7 @@ import com.aiinpocket.webredgood.service.AnalyticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,14 +23,16 @@ public class AnalyticsController {
 
     @Operation(summary = "依城市聚合")
     @GetMapping("/city-summary")
-    public List<CitySummary> citySummary(){
-        return analyticsService.citySummaryList();
+    public ResponseEntity<List<CitySummary>> citySummary(){
+
+        return ResponseEntity.ok(analyticsService.citySummaryList());
     }
 
     @Operation(summary = "依標籤聚合")
     @GetMapping("/tag-summary")
-    public List<TagSummary> tagSummary(){
-        return analyticsService.tagSummaryList();
+    public ResponseEntity<List<TagSummary>> tagSummary(){
+
+        return ResponseEntity.ok(analyticsService.tagSummaryList());
     }
 
 }

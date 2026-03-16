@@ -45,7 +45,8 @@ public class RecommendationService {
         return followerDistributionResponse;
     }
 
-    public FollowerDistributionResponse getFollowerDistributionInternal(Long influencerId, Long tagId)
+    // internal 不對外暴露
+    private FollowerDistributionResponse getFollowerDistributionInternal(Long influencerId, Long tagId)
     {
         log.info("開始查找網紅的粉絲分布, influencerId={}, tagId={}", influencerId, tagId);
 
