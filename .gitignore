@@ -1,16 +1,5 @@
-# Compiled class file
+# --- Java & Build Artifacts ---
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
 *.nar
@@ -19,11 +8,23 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# --- IDEs & Tools ---
+.idea/
+*.iml
+.vscode/
+.claude/
+CLAUDE.md
+.mtj.tmp/
+
+# --- Logs & Temporary Files ---
+*.log
+logs/
 hs_err_pid*
 replay_pid*
 
-.idea
-.claude
-CLAUDE.md
+# --- BlueJ ---
+*.ctxt
 
+# --- System Files ---
+Thumbs.db
+.DS_Store
